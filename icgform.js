@@ -8,10 +8,11 @@ function set(e,v){const p=e.tagName=='TEXTAREA'?HTMLTextAreaElement.prototype:HT
 const log=[];const els=[...document.querySelectorAll('input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=radio]):not([type=checkbox]):not([type=file]),textarea')].filter(e=>e.offsetParent!==null||e.getClientRects().length);
 const telEls=els.filter(e=>/電話|TEL|tel|phone/i.test(lab(e))&&e.tagName!='TEXTAREA');let ti=0;
 const zipEls=els.filter(e=>/郵便|〒|zip|postal|post/i.test(lab(e)));let zi=0;
-const nameEls=els.filter(e=>!/会社|法人|企業|社名|団体|company|mail|メール|電話|tel|住所|件名|subject|url|カナ|かな|フリガナ|ふりがな|kana|furi|担当|部署/i.test(lab(e))&&/氏名|名前|お名前|name|姓|名/i.test(lab(e)));let ni=0;
+const nameEls=els.filter(e=>!/会社|法人|企業|社名|団体|company|mail|メール|電話|tel|住所|件名|subject|url|カナ|かな|フリガナ|ふりがな|kana|furi|担当|部署|役職|職名|マガジン|画像|認証/i.test(lab(e))&&/氏名|名前|お名前|name|姓|名/i.test(lab(e)));let ni=0;
 const kanaEls=els.filter(e=>/カナ|かな|フリガナ|ふりがな|kana|furi/i.test(lab(e))&&!/会社|法人|企業/.test(lab(e)));let ki=0;
 for(const e of els){const L=lab(e);let v=null;
- if(e.tagName=='TEXTAREA'){v=BODY}
+ if(/画像認証|認証コード|captcha|マガジン|メルマガ/i.test(L)){v=null}
+ else if(e.tagName=='TEXTAREA'){v=BODY}
  else if(/mail|メール/i.test(L))v=D.mail;
  else if(telEls.includes(e)){v=telEls.length>=3?[D.t1,D.t2,D.t3][ti++]||'':D.tel}
  else if(zipEls.includes(e)){v=zipEls.length>=2?[D.z1,D.z2][zi++]||'':D.zip}
@@ -25,7 +26,7 @@ for(const e of els){const L=lab(e);let v=null;
  else if(/住所|所在地|address|addr/i.test(L))v=D.addr;
  else if(/件名|題名|タイトル|subject|title/i.test(L))v=SUBJ;
  else if(/URL|ホームページ|website|web/i.test(L))v=D.url;
- else if(/部署|担当/.test(L))v='ホームページ制作担当';
+ else if(/部署|担当|役職/.test(L))v='ホームページ制作担当';
  if(v!==null&&v!==''){set(e,v);log.push('✔ '+L.slice(0,25)+' = '+v.slice(0,20))}else log.push('✘ '+L.slice(0,40))}
 document.querySelectorAll('select').forEach(s=>{const L=lab(s);let o=[...s.options].find(o=>/その他|ご提案|営業|other/i.test(o.text));if(/都道府県|pref/i.test(L))o=[...s.options].find(o=>o.text.includes('大阪'));if(o){s.value=o.value;s.dispatchEvent(new Event('change',{bubbles:true}));log.push('▼ '+L.slice(0,20)+' = '+o.text)}else log.push('▽ '+L.slice(0,30)+' opts:'+[...s.options].map(o=>o.text).join('/').slice(0,60))});
 const rc=[...document.querySelectorAll('input[type=radio],input[type=checkbox]')].map(e=>e.name+':'+(e.value||'')+'['+(e.closest('label')?.innerText||lab(e)).trim().slice(0,20)+']');if(rc.length)log.push('RC '+rc.join(' ; ').slice(0,400));
